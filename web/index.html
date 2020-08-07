@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<header></header>
+<body>
+    <button id="wwwc">我要wwwc</button>
+    <div id="dicomImage" style="width: 512px;height: 512px;"></div>
+</body>
+<script src="https://unpkg.com/hammerjs@2.0.8/hammer.js"></script>
+<script src="https://unpkg.com/cornerstone-core@2.3.0/dist/cornerstone.js"></script>
+<script src="https://unpkg.com/cornerstone-math@0.1.8/dist/cornerstoneMath.min.js"></script>
+<script src="https://unpkg.com/cornerstone-wado-image-loader@3.1.2/dist/cornerstoneWADOImageLoader.min.js"></script>
+<script src="https://unpkg.com/cornerstone-web-image-loader@2.1.1/dist/cornerstoneWebImageLoader.min.js"></script>
+<script src="https://unpkg.com/cornerstone-tools@4.20.1/dist/cornerstoneTools.js"></script>
+<script src="https://unpkg.com/dicom-parser@1.8.5/dist/dicomParser.min.js"></script>
+<script>
+    cornerstoneTools.external.cornerstone = cornerstone;
+    cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
+    cornerstoneTools.external.Hammer = Hammer;
+    cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
+    cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
+    //'dicomweb' 'wadouri'  'http'
+    var imageId = "wadouri:http://127.0.0.1:8000/read1";
+    var imageIds = ["wadouri:http://127.0.0.1:8000/read1",
+    "wadouri:http://127.0.0.1:8000/read2",
+    "wadouri:http://127.0.0.1:8000/read3",
+    "wadouri:http://127.0.0.1:8000/read4",
+    "wadouri:http://127.0.0.1:8000/read5",
+    "wadouri:http://127.0.0.1:8000/read6",
+    "wadouri:http://127.0.0.1:8000/read7",
+    "wadouri:http://127.0.0.1:8000/read8",
+    "wadouri:http://127.0.0.1:8000/read9"]
+    //设置stack
+    const stack = {
+        currentImageIdIndex: 0,
+        imageIds
+    }
+    //定义stack滚动工具
+    const StackScrollMouseWheelTool = cornerstoneTools.StackScrollMouseWheelTool
+    //初始化tools
+    cornerstoneTools.init();
+    var element = document.getElementById('dicomImage');
+    cornerstone.enable(element);
+    
+    //角度
+    const AngleTool = cornerstoneTools.AngleTool;
+    cornerstoneTools.addTool(AngleTool);
+    cornerstoneTools.setToolActive('Angle',{mouseButtonMask: 1})
+
+    //wwwc
+    const WwwcTool = cornerstoneTools.WwwcTool;
+    cornerstoneTools.addTool(WwwcTool);
+    // cornerstoneTools.setToolActive('Wwwc',{mouseButtonMask: 1})
+
+    cornerstone.loadAndCacheImage(imageIds[0]).then(function(image) {
+        cornerstone.displayImage(element, image)
+        cornerstoneTools.addStackStateManager(element, ['stack'])
+        cornerstoneTools.addToolState(element, 'stack', stack)
+    })
+    cornerstoneTools.addTool(StackScrollMouseWheelTool)
+    cornerstoneTools.setToolActive('StackScrollMouseWheel', { })
+    function disableAllTools(){
+        cornerstoneTools.setToolDisabled('Wwwc');
+        cornerstoneTools.setToolDisabled('Angle');
+    }
+
+    document.getElementById('wwwc').addEventListener('click',function(){
+        //使得绑定左键的其他工具失效
+        disableAllTools();
+        //激活wwwc左键
+        cornerstoneTools.setToolActive('Wwwc',{mouseButtonMask:1})
+    })
+
+</script>
+
+
+
+</html>
